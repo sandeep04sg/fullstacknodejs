@@ -30,7 +30,7 @@ router.post("/register", (req, res) => {
         avatar,
         password: req.body.password,
       });
-      bcryptPassword(newUser, res, user); //getsalt is closed
+      bcryptPassword(newUser, res, user);
     } //else method is closed
   }); //findone is closed
 }); //post method is closed
@@ -39,13 +39,41 @@ router.post("/register", (req, res) => {
 function bcryptPassword(newUser, res, user) {
   bcrypt.genSalt(saltRounds, (err, salt) => {
     bcrypt.hash(newUser.password, salt, (err, hash) => {
-      if (err) throw err;
-      newUser.password = hash;
-      newUser
-        .save()
-        .then((User) => res.json(user))
-        .catch((err) => console.log(err));
+      if (err) {
+        throw err;
+      } else {
+        newUser.password = hash;
+        newUser
+          .save()
+          .then((user) => res.json(user))
+          .catch((err) => console.log(err));
+      }
+    });
+  }); //getsalt is closed
+}
+
+// jwtToken
+//@acces public
+//@route Post api/users/login
+//@desc Login user jwtToken
+router.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  User.findOne(email).then((user) => {
+    // find user
+    if (!user) {
+      return res.status(404).json({
+        email: "email not found",
+      });
+    }
+    //check password
+    bcrypt.compare(password, user.password).then((isMatch) => {
+      if (isMatch) {
+        return res.json({ msg: "password is match" });
+      } else {
+        return res.status(400).json({ password: "incorrect password" });
+      }
     });
   });
-}
+});
 module.exports = router;
