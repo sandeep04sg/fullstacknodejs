@@ -1,24 +1,30 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
+const bodyparser = require("body-parser");
 const posts = require("./routes/api/posts");
 const profile = require("./routes/api/profile");
 const users = require("./routes/api/users");
 
 //intialize the variable called app
 const app = express();
+// middelware service body-parser
+app.use(bodyparser.urlencoded({ extended: false }));
+app.use(bodyparser.json());
 //DB CONFIG
 const db = require("./config/keys").mongoURI;
 //connect to database
 mongoose
-  .connect(db)
+  .connect(db, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("mongoose database connected"))
   .catch((err) => console.log(err));
 
 //routing
 app.get("/", (req, res) => res.send("hello sandip"));
 
-//uses routes
+// //uses routes
 app.use("/api/users", users);
 app.use("/api/profile", profile);
 app.use("/api/posts", posts);
