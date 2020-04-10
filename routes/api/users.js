@@ -6,6 +6,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const keys = require("../../config/keys");
+//load input validation
+const validateRegisterInput = require("../../validation/register");
 // load user model
 const User = require("../../models/User");
 //@acces public
@@ -18,6 +20,11 @@ const saltRounds = 10;
 //@route GET api/users/register
 //@desc to register users
 router.post("/register", (req, res) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+  //check validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
   User.findOne({ email: req.body.email }).then((user) => {
     if (user) {
       return res.status(400).json({ email: "email already exists" });
