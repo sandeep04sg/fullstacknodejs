@@ -4,7 +4,7 @@ const bodyparser = require("body-parser");
 const posts = require("./routes/api/posts");
 const profile = require("./routes/api/profile");
 const users = require("./routes/api/users");
-
+const passport = require("passport");
 //intialize the variable called app
 const app = express();
 // middelware service body-parser
@@ -21,8 +21,10 @@ mongoose
   .then(() => console.log("mongoose database connected"))
   .catch((err) => console.log(err));
 
-//routing
-app.get("/", (req, res) => res.send("hello sandip"));
+//passport middleware
+app.use(passport.initialize());
+//passport config
+require("./config/passport")(passport);
 
 // //uses routes
 app.use("/api/users", users);
